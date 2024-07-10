@@ -124,6 +124,7 @@ const ApprovalRequestList = () => {
             <th onClick={() => handleSort("status")}>
               Status {getSortIndicator("status")}
             </th>
+            <th>Comment</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -133,6 +134,7 @@ const ApprovalRequestList = () => {
               <td>{request.id}</td>
               <td>{request.approver_name}</td>
               <td>{request.status_name}</td>
+              <td>{request.comment}</td>
               <td>
                 <Button
                   variant="success"

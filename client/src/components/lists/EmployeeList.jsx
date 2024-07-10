@@ -6,11 +6,13 @@ import {
   Dropdown,
   DropdownButton,
 } from "react-bootstrap";
+import { useParams } from "react-router-dom";
 import EditEmployeeModal from "../modals/EditEmployeeModal";
 import axios from "../../utils/axios";
 import AddEmployeeModal from "../modals/AddEmployeeModal";
 
 const EmployeeList = () => {
+  const { role } = useParams();
   const [employees, setEmployees] = useState([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
@@ -128,7 +130,7 @@ const EmployeeList = () => {
         value={search}
         onChange={handleSearch}
       />
-      <DropdownButton title={`Filter: ${filter}`}>
+      <DropdownButton title={`Filter: ${filter}`} className="mb-3">
         <Dropdown.Item onClick={() => handleFilter("All")}>All</Dropdown.Item>
         <Dropdown.Item onClick={() => handleFilter("Active")}>
           Active
@@ -137,13 +139,15 @@ const EmployeeList = () => {
           Inactive
         </Dropdown.Item>
       </DropdownButton>
-      <Button
-        variant="primary"
-        className="mt-2 mb-3"
-        onClick={() => handleAdd({})}
-      >
-        Add Employee
-      </Button>
+      {role !== "ProjectManager" && (
+        <Button
+          variant="primary"
+          className="mt-2 mb-3"
+          onClick={() => handleAdd({})}
+        >
+          Add Employee
+        </Button>
+      )}
       <Table striped bordered hover>
         <thead>
           <tr>
@@ -165,7 +169,7 @@ const EmployeeList = () => {
             <th onClick={() => handleSort("out_of_office_balance")}>
               Out off Office balance {getSortIndicator("out_of_office_balance")}
             </th>
-            <th>Actions</th>
+            {role !== "ProjectManager" && <th>Actions</th>}
           </tr>
         </thead>
         <tbody>
@@ -177,29 +181,31 @@ const EmployeeList = () => {
               <td>{employee.status ? "Active" : "Inactive"}</td>
               <td>{employee.people_partner_name}</td>
               <td>{employee.out_of_office_balance}</td>
-              <td>
-                <Button
-                  variant="secondary"
-                  onClick={() => handleEdit(employee)}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant={employee.status ? "danger" : "success"}
-                  className="mx-2"
-                  onClick={() =>
-                    handleEmployeeStatusToggle(employee.id, employee.status)
-                  }
-                >
-                  {employee.status ? "Deactivate" : "Activate"}
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={() => handleDelete(employee.id)}
-                >
-                  Delete
-                </Button>
-              </td>
+              {role !== "ProjectManager" && (
+                <td>
+                  <Button
+                    variant="secondary"
+                    onClick={() => handleEdit(employee)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant={employee.status ? "danger" : "success"}
+                    className="mx-2"
+                    onClick={() =>
+                      handleEmployeeStatusToggle(employee.id, employee.status)
+                    }
+                  >
+                    {employee.status ? "Deactivate" : "Activate"}
+                  </Button>
+                  <Button
+                    variant="danger"
+                    onClick={() => handleDelete(employee.id)}
+                  >
+                    Delete
+                  </Button>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

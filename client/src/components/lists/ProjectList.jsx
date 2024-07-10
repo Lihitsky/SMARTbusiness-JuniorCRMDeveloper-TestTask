@@ -6,11 +6,13 @@ import {
   Dropdown,
   DropdownButton,
 } from "react-bootstrap";
+import { useParams } from "react-router-dom";
 import AddProjectModal from "../modals/AddProjectModal";
 import EditProjectModal from "../modals/EditProjectModal";
 import axios from "../../utils/axios";
 
 const ProjectList = () => {
+  const { role } = useParams();
   const [projects, setProjects] = useState([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
@@ -130,7 +132,7 @@ const ProjectList = () => {
         value={search}
         onChange={handleSearch}
       />
-      <DropdownButton title={`Filter: ${filter}`}>
+      <DropdownButton title={`Filter: ${filter}`} className="mb-3">
         <Dropdown.Item onClick={() => handleFilter("All")}>All</Dropdown.Item>
         <Dropdown.Item onClick={() => handleFilter("Active")}>
           Active
@@ -139,13 +141,15 @@ const ProjectList = () => {
           Inactive
         </Dropdown.Item>
       </DropdownButton>
-      <Button
-        variant="primary"
-        className="mt-2 mb-3"
-        onClick={() => handleAdd({})}
-      >
-        Add Project
-      </Button>
+      {role !== "HR" && (
+        <Button
+          variant="primary"
+          className="mt-2 mb-3"
+          onClick={() => handleAdd({})}
+        >
+          Add Project
+        </Button>
+      )}
       <Table striped bordered hover>
         <thead>
           <tr>
@@ -170,7 +174,7 @@ const ProjectList = () => {
             <th onClick={() => handleSort("comment")}>
               Comment {getSortIndicator("comment")}
             </th>
-            <th>Actions</th>
+            {role !== "HR" && <th>Actions</th>}
           </tr>
         </thead>
         <tbody>
@@ -183,31 +187,35 @@ const ProjectList = () => {
               <td>{project.project_manager_name}</td>
               <td>{project.status ? "Active" : "Inactive"}</td>
               <td>{project.comment}</td>
-              <td>
-                <Button variant="secondary" onClick={() => handleEdit(project)}>
-                  Edit
-                </Button>
-                <Button
-                  variant={project.status ? "danger" : "success"}
-                  className="mx-2"
-                  onClick={() =>
-                    handleProjectStatusToggle(project.id, project.status)
-                  }
-                >
-                  {project.status ? "Deactivate" : "Activate"}
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={() => handleDelete(project.id)}
-                >
-                  Delete
-                </Button>
-              </td>
+              {role !== "HR" && (
+                <td>
+                  <Button
+                    variant="secondary"
+                    onClick={() => handleEdit(project)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant={project.status ? "danger" : "success"}
+                    className="mx-2"
+                    onClick={() =>
+                      handleProjectStatusToggle(project.id, project.status)
+                    }
+                  >
+                    {project.status ? "Deactivate" : "Activate"}
+                  </Button>
+                  <Button
+                    variant="danger"
+                    onClick={() => handleDelete(project.id)}
+                  >
+                    Delete
+                  </Button>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>
       </Table>
-
       {/* Pagination Controls */}
       <div className="pagination">
         <Button
@@ -238,13 +246,11 @@ const ProjectList = () => {
           Next
         </Button>
       </div>
-
       <AddProjectModal
         show={showAddModal}
         onClose={handleModalClose}
         onRefreshList={handleRefreshList}
       />
-
       {selectedProject && (
         <EditProjectModal
           show={showEditModal}

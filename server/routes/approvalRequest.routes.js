@@ -30,6 +30,12 @@ router.put(
   approvalRequestController.approveApprovalRequest
 );
 
+// Reject Approval Request
+router.put(
+  "/approvalRequest/:id/reject",
+  approvalRequestController.rejectApprovalRequest
+);
+
 // Delete Approval Request by leave request id
 router.delete(
   "/approvalRequest/:leave_request_id",

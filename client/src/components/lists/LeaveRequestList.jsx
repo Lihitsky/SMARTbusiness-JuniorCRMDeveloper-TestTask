@@ -6,11 +6,13 @@ import {
   Dropdown,
   DropdownButton,
 } from "react-bootstrap";
+import { useParams } from "react-router-dom";
 import AddLeaveRequestModal from "../modals/AddLeaveRequestModal";
 import EditLeaveRequestModal from "../modals/EditLeaveRequestModal";
 import axios from "../../utils/axios";
 
 const LeaveRequestList = () => {
+  const { role } = useParams();
   const [requests, setRequests] = useState([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
@@ -67,7 +69,7 @@ const LeaveRequestList = () => {
         leave_request_id: request.id,
         status_id: 1,
         approver_id: request.employee_id,
-        comment: "",
+        comment: request.comment,
       });
       handleRefreshList();
     } catch (error) {
@@ -131,7 +133,7 @@ const LeaveRequestList = () => {
         value={search}
         onChange={handleSearch}
       />
-      <DropdownButton title={`Filter: ${filter}`}>
+      <DropdownButton title={`Filter: ${filter}`} className="mb-3">
         <Dropdown.Item onClick={() => handleFilter("All")}>All</Dropdown.Item>
         <Dropdown.Item onClick={() => handleFilter("New")}>New</Dropdown.Item>
         <Dropdown.Item onClick={() => handleFilter("Submitted")}>
@@ -147,13 +149,15 @@ const LeaveRequestList = () => {
           Canceled
         </Dropdown.Item>
       </DropdownButton>
-      <Button
-        variant="primary"
-        className="mt-2 mb-3"
-        onClick={() => handleAdd({})}
-      >
-        Add Leave Request
-      </Button>
+      {role !== "HR" && role !== "ProjectManager" && (
+        <Button
+          variant="primary"
+          className="mt-2 mb-3"
+          onClick={() => handleAdd({})}
+        >
+          Add Leave Request
+        </Button>
+      )}
       <Table striped bordered hover>
         <thead>
           <tr>
@@ -172,10 +176,11 @@ const LeaveRequestList = () => {
             <th onClick={() => handleSort("end_date")}>
               End Date {getSortIndicator("end_date")}
             </th>
-            <th onClick={() => handleSort("status")}>
-              Status {getSortIndicator("status")}
+            <th onClick={() => handleSort("status_id")}>
+              Status {getSortIndicator("status_id")}
             </th>
-            <th>Actions</th>
+            <th>Comment</th>
+            {role !== "HR" && role !== "ProjectManager" && <th>Actions</th>}
           </tr>
         </thead>
         <tbody>
@@ -187,36 +192,39 @@ const LeaveRequestList = () => {
               <td>{new Date(request.start_date).toLocaleDateString()}</td>
               <td>{new Date(request.end_date).toLocaleDateString()}</td>
               <td>{request.status_name}</td>
-              <td>
-                <Button
-                  variant="secondary"
-                  onClick={() => handleEdit(request)}
-                  disabled={
-                    request.status_name === "Approved" ||
-                    request.status_name === "Canceled"
-                  }
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="success"
-                  className="mx-2"
-                  onClick={() => handleSubmitted(request)}
-                  disabled={
-                    request.status_name !== "New" &&
-                    request.status_name !== "Canceled"
-                  }
-                >
-                  Submit
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={() => handleCancelled(request)}
-                  disabled={request.status_name !== "Submitted"}
-                >
-                  Cancel
-                </Button>
-              </td>
+              <td>{request.comment}</td>
+              {role !== "HR" && role !== "ProjectManager" && (
+                <td>
+                  <Button
+                    variant="secondary"
+                    onClick={() => handleEdit(request)}
+                    disabled={
+                      request.status_name === "Approved" ||
+                      request.status_name === "Rejected"
+                    }
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="success"
+                    className="mx-2"
+                    onClick={() => handleSubmitted(request)}
+                    disabled={
+                      request.status_name !== "New" &&
+                      request.status_name !== "Canceled"
+                    }
+                  >
+                    Submit
+                  </Button>
+                  <Button
+                    variant="danger"
+                    onClick={() => handleCancelled(request)}
+                    disabled={request.status_name !== "Submitted"}
+                  >
+                    Cancel
+                  </Button>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

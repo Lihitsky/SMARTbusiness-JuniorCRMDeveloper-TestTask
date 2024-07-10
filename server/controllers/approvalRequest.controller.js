@@ -156,10 +156,10 @@ class ApprovalRequestController {
   }
 
   // UPDATE Approval request status
-  async updateApprovalRequestStatus(req, res) {
+  async rejectApprovalRequest(req, res) {
     try {
       const { id } = req.params;
-      const { status_id, comment } = req.body;
+      const { comment } = req.body;
 
       const approvalRequest = await pool.query(
         "SELECT * FROM approval_requests WHERE id = $1",
@@ -170,37 +170,18 @@ class ApprovalRequestController {
         return res.status(404).json("Approval request not found");
       }
 
-      const { leave_request_id, approver_id } = approvalRequest.rows[0];
+      const { leave_request_id } = approvalRequest.rows[0];
 
+      // Update leave request with rejected status
       await pool.query(
-        "UPDATE approval_requests SET status_id = $1, comment = $2 WHERE id = $3",
-        [status_id, comment, id]
+        "UPDATE leave_requests SET status_id = $1, comment = $2 WHERE id = $3",
+        [3, comment, leave_request_id]
       );
 
-      if (status_id === "Approved" || status_id === "Rejected") {
-        await pool.query(
-          "UPDATE leave_requests SET status = $1 WHERE id = $2",
-          [status_id, leave_request_id]
-        );
+      // Delete rejected approve request
+      await pool.query("DELETE FROM approval_requests WHERE id = $1", [id]);
 
-        if (status_id === "Approved") {
-          const employee = await pool.query(
-            "SELECT employee_id, start_date, end_date FROM leave_requests WHERE id = $1",
-            [leave_request_id]
-          );
-
-          const { employee_id, start_date, end_date } = employee.rows[0];
-          const days =
-            (new Date(end_date) - new Date(start_date)) / (1000 * 60 * 60 * 24);
-
-          await pool.query(
-            "UPDATE employees SET out_of_office_balance = out_of_office_balance - $1 WHERE id = $2",
-            [days, employee_id]
-          );
-        }
-      }
-
-      res.json("Approval request status updated successfully");
+      res.json("Approval request approved successfully");
     } catch (error) {
       console.error(error.message);
       res.status(500).send("Server error");
