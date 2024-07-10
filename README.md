@@ -52,7 +52,6 @@ The application uses PostgreSQL for the database. See "Database Schema.png"
 1. Clone the repository:
     ```bash
     git clone https://github.com/Lihitsky/SMARTbusiness-JuniorCRMDeveloper-TestTask.git
-    cd out-of-office
     ```
 
 2. Install backend dependencies:
