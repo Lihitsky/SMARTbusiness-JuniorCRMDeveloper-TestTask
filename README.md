@@ -1,4 +1,4 @@
-# Out of Office Solution
+# Out of Office Solution (SMART business)
 
 ## Overview
 This project is an "Out of Office" solution designed to manage employee leave requests, approval requests, and projects. The application provides different functionalities based on user roles: HR Manager, Project Manager, and Employee.
@@ -40,7 +40,7 @@ The application uses PostgreSQL for the database. See "Database Schema.png"
 - **React**: JavaScript library for building user interfaces.
 - **Axios**: Promise-based HTTP client for the browser and Node.js.
 - **Bootstrap**: Frontend framework for responsive web design.
-- 
+  
 ## Setup and Installation
 
 ### Prerequisites
