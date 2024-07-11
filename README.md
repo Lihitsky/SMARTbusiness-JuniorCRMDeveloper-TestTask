@@ -82,7 +82,7 @@ The application uses PostgreSQL for the database. See "Database Schema.png"
     ```
 
 ### Screenshots
-Screenshots of the application with comments are included in the `screenshots` directory.
+Screenshots of the application are included in the `screenshots` directory.
 
 ## License
 This project is licensed under the MIT License. See the `LICENSE` file for details.
